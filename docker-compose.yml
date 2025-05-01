@@ -1,0 +1,44 @@
+services:
+  foogle-frontend:
+    container_name: foogle-frontend
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    depends_on:
+      - foogle-db
+
+  foogle-backend:
+    container_name: foogle-backend
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - foogle-db
+  
+  foogle-db:
+    container_name: foogle-db
+    image: postgres:alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: foogle
+      POSTGRES_PASSWORD: foogle
+      POSTGRES_DB: foogle_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  adminer:
+    container_name: adminer
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - foogle-db
+volumes:
+  pgdata:
